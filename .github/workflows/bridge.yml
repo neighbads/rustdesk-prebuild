@@ -29,6 +29,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Patch hbb_common with custom config
+        shell: bash
+        run: |
+          cd ./libs/hbb_common/
+          [ -f ../../.github/patches/custom_hbb_common.sh ] && ../../.github/patches/custom_hbb_common.sh
+
       - name: Install prerequisites
         run: |
           sudo apt-get install ca-certificates -y
@@ -90,6 +96,7 @@ jobs:
         with:
           name: bridge-artifact
           path: |
+            ./libs/hbb_common/src/config.rs
             ./src/bridge_generated.rs
             ./src/bridge_generated.io.rs
             ./flutter/lib/generated_bridge.dart
