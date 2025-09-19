@@ -458,16 +458,33 @@ class _GeneralState extends State<_General> {
     }
 
     return _Card(title: 'Service', children: [
-      Obx(() => _Button(serviceStop.value ? 'Start' : 'Stop', () {
-            () async {
-              serviceBtnEnabled.value = false;
-              await start_service(serviceStop.value);
-              // enable the button after 1 second
-              Future.delayed(const Duration(seconds: 1), () {
-                serviceBtnEnabled.value = true;
-              });
-            }();
-          }, enabled: serviceBtnEnabled.value))
+      Row(
+        children: [
+          Obx(() => ElevatedButton(
+            onPressed: serviceBtnEnabled.value ? () {
+              () async {
+                serviceBtnEnabled.value = false;
+                await start_service(serviceStop.value);
+                // enable the button after 1 second
+                Future.delayed(const Duration(seconds: 1), () {
+                  serviceBtnEnabled.value = true;
+                });
+              }();
+            } : null,
+            child: Text(translate(serviceStop.value ? 'Start' : 'Stop'))
+                .marginSymmetric(horizontal: 15),
+          )),
+          const SizedBox(width: 10),
+          if (isWindows && !bind.mainIsInstalled())
+            ElevatedButton(
+              onPressed: () async {
+                await bind.mainGotoInstall();
+              },
+              child: Text(translate('Install'))
+                  .marginSymmetric(horizontal: 15),
+            ),
+        ],
+      ).marginOnly(left: _kContentHMargin),
     ]);
   }
 
