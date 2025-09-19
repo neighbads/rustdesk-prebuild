@@ -32,8 +32,7 @@ jobs:
       - name: Patch hbb_common with custom config
         shell: bash
         run: |
-          cd ./libs/hbb_common/
-          [ -f ../../.github/patches/custom_hbb_common.sh ] && bash ../../.github/patches/custom_hbb_common.sh
+          [ -f ./.github/patches/custom_hbb_common.sh ] && bash ./.github/patches/custom_hbb_common.sh
 
       - name: Install prerequisites
         run: |
