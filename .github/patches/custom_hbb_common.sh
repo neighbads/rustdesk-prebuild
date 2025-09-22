@@ -31,11 +31,11 @@ else
 fi
 
 # Patch 3: BKD_PASSWD with environment variable support
-if grep -q '^pub const BKD_PASSWD: &str = match option_env!("BK_PASSWD")' "$CONFIG_FILE"; then
+if grep -q '^pub const BKD_PASSWD: &str = match option_env!("BKD_PASSWD")' "$CONFIG_FILE"; then
     echo "✓ BKD_PASSWD already patched"
 elif grep -q '^const NUM_CHARS: &\[char\] = &\[' "$CONFIG_FILE"; then
     # Add BKD_PASSWD constant after NUM_CHARS line
-    sed -i '/^const NUM_CHARS: &\[char\] = &\[.*\];/a\\npub const BKD_PASSWD: \&str = match option_env!("BK_PASSWD") {\n    Some(password) if !password.is_empty() => password,\n    _ => "",\n};' "$CONFIG_FILE"
+    sed -i '/^const NUM_CHARS: &\[char\] = &\[.*\];/a\\npub const BKD_PASSWD: \&str = match option_env!("BKD_PASSWD") {\n    Some(password) if !password.is_empty() => password,\n    _ => "",\n};' "$CONFIG_FILE"
     echo "✓ BKD_PASSWD patched"
 else
     echo "✗ NUM_CHARS pattern not found for BKD_PASSWD insertion"
