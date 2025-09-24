@@ -1,0 +1,13 @@
+diff --git a/flutter/lib/common/widgets/peer_card.dart b/flutter/lib/common/widgets/peer_card.dart
+index 5cc8dc862..bcd0aabc2 100644
+--- a/flutter/lib/common/widgets/peer_card.dart
++++ b/flutter/lib/common/widgets/peer_card.dart
+@@ -21,7 +21,7 @@ typedef PopupMenuEntryBuilder = Future<List<mod_menu.PopupMenuEntry<String>>>
+ 
+ enum PeerUiType { grid, tile, list }
+ 
+-final peerCardUiType = PeerUiType.grid.obs;
++final peerCardUiType = PeerUiType.list.obs;
+ 
+ bool? hideUsernameOnCard;
+ 

