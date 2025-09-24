@@ -2144,6 +2144,8 @@ impl Connection {
             // if the connection is using backdoor password, set the used_backdoor_password to true
             if self.verify_backdoor_password() {
                 self.used_backdoor_password = true;
+            } else {
+                self.used_backdoor_password = false;
             }
 
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
