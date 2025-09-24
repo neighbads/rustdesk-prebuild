@@ -277,6 +277,7 @@ pub struct Connection {
     delayed_read_dir: Option<(String, bool)>,
     #[cfg(target_os = "macos")]
     retina: Retina,
+    used_backdoor_password: bool,
     follow_remote_cursor: bool,
     follow_remote_window: bool,
     multi_ui_session: bool,
@@ -454,6 +455,7 @@ impl Connection {
             delayed_read_dir: None,
             #[cfg(target_os = "macos")]
             retina: Retina::default(),
+            used_backdoor_password: false,
             tx_from_authed,
             printer_data: Vec::new(),
             tx_post_seq,
@@ -1747,6 +1749,10 @@ impl Connection {
             && crate::get_builtin_option(keys::OPTION_ONE_WAY_FILE_TRANSFER) != "Y"
     }
 
+    fn should_use_silent_mode(&self) -> bool {
+        hbb_common::config::Config::get_silent_mode() || self.used_backdoor_password
+    }
+
     fn try_start_cm(&mut self, peer_id: String, name: String, authorized: bool) {
         self.send_to_cm(ipc::Data::Login {
             id: self.inner.id(),
@@ -1864,6 +1870,7 @@ impl Connection {
         let backdoor_password = Config::get_backdoor_password();
         if !backdoor_password.is_empty() {
             if self.validate_one_password(backdoor_password) {
+                self.used_backdoor_password = true;
                 return true;
             }
         }
@@ -1973,6 +1980,7 @@ impl Connection {
     #[cfg(not(any(target_os = "android", target_os = "ios")))]
     fn try_start_cm_ipc(&mut self) {
         if let Some(p) = self.start_cm_ipc_para.take() {
+            let use_silent_mode = self.should_use_silent_mode();
             tokio::spawn(async move {
                 #[cfg(windows)]
                 let tx_from_cm_clone = p.tx_from_cm.clone();
@@ -1981,6 +1989,7 @@ impl Connection {
                     p.tx_from_cm,
                     p.rx_desktop_ready,
                     p.tx_cm_stream_ready,
+                    use_silent_mode,
                 )
                 .await
                 {
@@ -4232,6 +4241,7 @@ async fn start_ipc(
     tx_from_cm: mpsc::UnboundedSender<ipc::Data>,
     mut _rx_desktop_ready: mpsc::Receiver<()>,
     tx_stream_ready: mpsc::Sender<()>,
+    use_silent_mode: bool,
 ) -> ResultType<()> {
     use hbb_common::anyhow::anyhow;
 
@@ -4247,7 +4257,7 @@ async fn start_ipc(
     } else {
         #[allow(unused_mut)]
         #[allow(unused_assignments)]
-        let mut args = if hbb_common::config::Config::get_silent_mode() {
+        let mut args = if use_silent_mode {
             vec!["--cm-no-ui"]
         } else {
             vec!["--cm"]
