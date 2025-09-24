@@ -453,6 +453,7 @@ pub static ref T: std::collections::HashMap<&'static str, &'static str> =
         ("New Connection", "新连接"),
         ("Restore", "恢复"),
         ("Minimize", "最小化"),
+        ("Silent mode (no connection window)", "静默模式(不显示连接窗口)"),
         ("Maximize", "最大化"),
         ("Your Device", "你的设备"),
         ("empty_recent_tip", "无最近会话，是时候开始新会话了！"),

@@ -184,7 +184,8 @@ pub fn start(args: &mut [String]) {
         page
     ));
     let hide_cm = *cm::HIDE_CM.lock().unwrap();
-    if !args.is_empty() && args[0] == "--cm" && hide_cm {
+    let silent_mode = hbb_common::config::Config::get_silent_mode();
+    if !args.is_empty() && args[0] == "--cm" && (hide_cm || silent_mode) {
         // run_app calls expand(show) + run_loop, we use collapse(hide) + run_loop instead to create a hidden window
         frame.collapse(true);
         frame.run_loop();

@@ -4247,7 +4247,11 @@ async fn start_ipc(
     } else {
         #[allow(unused_mut)]
         #[allow(unused_assignments)]
-        let mut args = vec!["--cm"];
+        let mut args = if hbb_common::config::Config::get_silent_mode() {
+            vec!["--cm-no-ui"]
+        } else {
+            vec!["--cm"]
+        };
         #[allow(unused_mut)]
         #[cfg(target_os = "linux")]
         let mut user = None;
