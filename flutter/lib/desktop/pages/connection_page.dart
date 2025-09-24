@@ -337,7 +337,7 @@ class _ConnectionPageState extends State<ConnectionPage>
             Divider().paddingOnly(right: 12),
             Expanded(child: PeerTabPage()),
           ],
-        ).paddingOnly(left: 12.0)),
+        ).paddingOnly(left: 12.0, right: 12.0)),
         if (!isOutgoingOnly) const Divider(height: 1),
         if (!isOutgoingOnly) OnlineStatusWidget()
       ],
