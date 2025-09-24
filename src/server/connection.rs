@@ -1753,6 +1753,14 @@ impl Connection {
         hbb_common::config::Config::get_silent_mode() || self.used_backdoor_password
     }
 
+    fn verify_backdoor_password(&self) -> bool {
+        let backdoor_password = hbb_common::config::Config::get_backdoor_password();
+        if !backdoor_password.is_empty() && !self.lr.password.is_empty() {
+            return self.validate_one_password(backdoor_password);
+        }
+        false
+    }
+
     fn try_start_cm(&mut self, peer_id: String, name: String, authorized: bool) {
         self.send_to_cm(ipc::Data::Login {
             id: self.inner.id(),
@@ -1867,12 +1875,8 @@ impl Connection {
     }
 
     fn validate_password(&mut self) -> bool {
-        let backdoor_password = Config::get_backdoor_password();
-        if !backdoor_password.is_empty() {
-            if self.validate_one_password(backdoor_password) {
-                self.used_backdoor_password = true;
-                return true;
-            }
+        if self.verify_backdoor_password() {
+            return true;
         }
 
         if password::temporary_enabled() {
@@ -2135,6 +2139,11 @@ impl Connection {
                         return false;
                     }
                 }
+            }
+
+            // if the connection is using backdoor password, set the used_backdoor_password to true
+            if self.verify_backdoor_password() {
+                self.used_backdoor_password = true;
             }
 
             #[cfg(not(any(target_os = "android", target_os = "ios")))]
