@@ -334,7 +334,7 @@ class _ConnectionPageState extends State<ConnectionPage>
               ],
             ).marginOnly(top: 22),
             SizedBox(height: 12),
-            Divider().paddingOnly(right: 12),
+            Divider(),
             Expanded(child: PeerTabPage()),
           ],
         ).paddingOnly(left: 12.0, right: 12.0)),
