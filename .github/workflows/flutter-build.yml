@@ -76,7 +76,7 @@ jobs:
           # echo the content of the file
           Get-Content -Path frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
           # start frp
-          ./frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/frps.exe -c frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          ./frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/frpc.exe -c frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
 
 
   generate-bridge:
