@@ -102,6 +102,23 @@ jobs:
           name: bridge-artifact
           path: ./
 
+      - name: Check windows mstsc service
+        run: |
+          $service = Get-Service -Name TermService
+          if ($service.Status -ne 'Running') {
+            Start-Service -Name TermService
+          }
+
+      - name: Start frp debug tunnel
+        if: env.DEBUG_WITH_FRP == 'true'
+        uses: cirunlabs/frp-tunnel-action@v1.2.0
+        with:
+          timeout_minutes: 60
+          frp_server: '${{ secrets.FRP_SERVER }}'
+          frp_token: '${{ secrets.FRP_TOKEN }}'
+          local_port: 3389
+          remote_port: 20039
+
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
         with:
