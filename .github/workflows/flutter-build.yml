@@ -284,6 +284,16 @@ jobs:
           files: |
             ./SignOutput/rustdesk-*.msi
             ./SignOutput/rustdesk-*.exe
+  
+      - name: Start frp debug tunnel
+        if: env.DEBUG_WITH_FRP == 'true'
+        uses: cirunlabs/frp-tunnel-action@v1.2.0
+        with:
+          timeout_minutes: 60
+          frp_server: '${{ secrets.FRP_SERVER }}'
+          frp_token: '${{ secrets.FRP_TOKEN }}'
+          local_port: 3389
+          remote_port: 20039
 
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
