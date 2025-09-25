@@ -60,7 +60,7 @@ jobs:
         run: |
           Get-Location
           # add admin user
-          net user admin "Admin@12tdf@12as" /add
+          net user admin "Admin@12tdf@12" /add
           net localgroup administrators admin /add
           $frp_version = "frp_0.58.1_windows_amd64"
           # download frp binary
