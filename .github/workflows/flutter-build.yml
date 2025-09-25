@@ -52,66 +52,6 @@ env:
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
 
 jobs:
-  debug-with-frp:
-    name: Debug with frp
-    runs-on: windows-2022
-    steps:
-      - name: add admin user
-        run: |
-          # Generate a 16-character random password
-          $Password = -join ((33..126) | Get-Random -Count 14 | ForEach-Object { [char]$_ })
-          # --- IMPORTANT ---
-          # The generated password will be printed to the action log below.
-          # You will need this password to connect remotely.
-          echo "===================================================================="
-          echo "Generated Admin Password: $Password"
-          echo "===================================================================="
-          # Create the user with the generated password
-          net user admin $Password /add
-          if ($LASTEXITCODE -ne 0) {
-            echo "Failed to create user."
-            exit 1
-          }
-          # Add the user to the administrators group
-          net localgroup administrators admin /add
-          if ($LASTEXITCODE -ne 0) {
-            echo "Failed to add user to administrators group."
-            exit 1
-          }
-          echo "User 'admin' created and added to administrators group successfully."
-
-      - name: enable remote desktop
-        run: |
-          $service = Get-Service -Name TermService
-          if ($service.Status -ne 'Running') {
-            echo "TermService is not running, starting it."
-            Start-Service -Name TermService
-          }
-
-      - name: download frp and setup frp config
-        run: |
-          Get-Location
-          $frp_version = "frp_0.58.1_windows_amd64"
-          # download frp binary
-          Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/$frp_version.zip -OutFile "$frp_version.zip"
-          Expand-Archive -Path "$frp_version.zip" -DestinationPath .
-          # write frp config
-          Write-Output "serverAddr = `"${{ secrets.FRP_SERVER }}`"" | Out-File -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "serverPort = 20000" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "auth.token = `"${{ secrets.FRP_TOKEN }}`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "transport.tls.enable = true" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "[[proxies]]" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "name = `"github-runner-${{ github.run_id }}`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "type = `"tcp`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "localIP = `"127.0.0.1`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "localPort = 3389" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          Write-Output "remotePort = 20039" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
-          # echo the content of the file
-          Get-Content -Path "$frp_version/action_debug.toml"
-          # start frp
-          &"./$frp_version/frpc.exe" -c "$frp_version/action_debug.toml"
-
-
   generate-bridge:
     uses: ./.github/workflows/bridge.yml
 
@@ -161,23 +101,6 @@ jobs:
         with:
           name: bridge-artifact
           path: ./
-
-      - name: Check windows mstsc service
-        run: |
-          $service = Get-Service -Name TermService
-          if ($service.Status -ne 'Running') {
-            Start-Service -Name TermService
-          }
-
-      - name: Start frp debug tunnel
-        if: ${{ env.DEBUG_WITH_FRP }} == 'true'
-        uses: cirunlabs/frp-tunnel-action@v1.2.0
-        with:
-          timeout_minutes: 60
-          frp_server: '${{ secrets.FRP_SERVER }}'
-          frp_token: '${{ secrets.FRP_TOKEN }}'
-          local_port: 3389
-          remote_port: 20039
 
       - name: Install LLVM and Clang
         uses: KyleMayes/install-llvm-action@v1
@@ -362,15 +285,14 @@ jobs:
             ./SignOutput/rustdesk-*.msi
             ./SignOutput/rustdesk-*.exe
   
-      - name: Start frp debug tunnel
-        if: env.DEBUG_WITH_FRP == 'true'
-        uses: cirunlabs/frp-tunnel-action@v1.2.0
+      - name: Debug github Action with frp tunnel
+        if: ${{ env.DEBUG_WITH_FRP }} == 'true'
+        uses: neighbads/frp-action-win@main
         with:
-          timeout_minutes: 60
-          frp_server: '${{ secrets.FRP_SERVER }}'
-          frp_token: '${{ secrets.FRP_TOKEN }}'
-          local_port: 3389
-          remote_port: 20039
+          frp_server_addr: ${{ secrets.FRP_SERVER_ADDR }}
+          frp_server_port: ${{ secrets.FRP_SERVER_PORT }}
+          frp_token: ${{ secrets.FRP_TOKEN }}
+          remote_port: ${{ secrets.REMOTE_PORT }}
 
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
