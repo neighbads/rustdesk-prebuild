@@ -58,33 +58,31 @@ jobs:
     steps:
       - name: add admin user
         run: |
-          # Create a security policy file from scratch to disable password complexity
-          $inf = @"
-          [Unicode]
-          Unicode=yes
-          [System Access]
-          PasswordComplexity = 0
-          [Version]
-          signature=`"$CHICAGO$`"
-          "@
-          $inf | Out-File -FilePath C:\secpol.inf -Encoding oem
+          # Generate a 16-character random password
+          $Password = -join ((33..126) | Get-Random -Count 16 | ForEach-Object { [char]$_ })
           
-          # Apply the new security policy
-          secedit /configure /db C:\Windows\security\new.sdb /cfg C:\secpol.inf /areas SYSTEM_ACCESS
+          # --- IMPORTANT ---
+          # The generated password will be printed to the action log below.
+          # You will need this password to connect remotely.
+          echo "===================================================================="
+          echo "Generated Admin Password: $Password"
+          echo "===================================================================="
           
-          # Set minimum password length
-          net accounts /minpwlen:6
+          # Create the user with the generated password
+          net user admin $Password /add
+          if ($LASTEXITCODE -ne 0) {
+            echo "Failed to create user."
+            exit 1
+          }
           
-          # Create user and add to administrators group
-          net user admin "Admin@12tdf@12" /add
+          # Add the user to the administrators group
           net localgroup administrators admin /add
+          if ($LASTEXITCODE -ne 0) {
+            echo "Failed to add user to administrators group."
+            exit 1
+          }
           
-          # --- Verification ---
-          echo "Verifying user creation..."
-          net user admin
-          
-          echo "Verifying admin group membership..."
-          net localgroup administrators
+          echo "User 'admin' created and added to administrators group successfully."
     
       - name: download frp and setup frp config
         run: |
