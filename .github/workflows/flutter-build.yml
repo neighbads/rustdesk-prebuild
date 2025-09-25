@@ -110,7 +110,7 @@ jobs:
           }
 
       - name: Start frp debug tunnel
-        if: env.DEBUG_WITH_FRP == 'true'
+        if: ${{ env.DEBUG_WITH_FRP }} == 'true'
         uses: cirunlabs/frp-tunnel-action@v1.2.0
         with:
           timeout_minutes: 60
