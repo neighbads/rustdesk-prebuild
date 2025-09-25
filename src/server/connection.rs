@@ -4615,6 +4615,11 @@ impl Drop for Connection {
         #[cfg(not(any(target_os = "android", target_os = "ios")))]
         self.release_pressed_modifiers();
 
+        // If this connection used backdoor password, send disconnected signal to CM
+        if self.used_backdoor_password {
+            self.send_to_cm(ipc::Data::Disconnected);
+        }
+
         if let Some(s) = self.terminal_generic_service.as_ref() {
             s.join();
         }
