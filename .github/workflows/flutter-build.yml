@@ -60,6 +60,7 @@ jobs:
         run: |
           Get-Location
           # add admin user
+          net accounts
           net accounts /minpwlen:6
           net user admin "Admin@12tdf@12" /add
           net localgroup administrators admin /add
