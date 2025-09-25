@@ -62,22 +62,22 @@ jobs:
           $frp_version = "frp_0.58.1_windows_amd64"
           # download frp binary
           Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/$frp_version.zip -OutFile "$frp_version.zip"
-          Expand-Archive -Path $frp_version.zip -DestinationPath .
+          Expand-Archive -Path "$frp_version.zip" -DestinationPath .
           # write frp config
-          Write-Output "serverAddr = `"${{ secrets.FRP_SERVER }}`"" | Out-File -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "serverPort = 20000" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "auth.token = `"${{ secrets.FRP_TOKEN }}`"" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "transport.tls.enable = true" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "[[proxies]]" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "name = `"github-runner-${{ github.run_id }}`"" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "type = `"tcp`"" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "localIP = `"127.0.0.1`"" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "localPort = 3389" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
-          Write-Output "remotePort = 20039" | Out-File -Append -FilePath $frp_version/action_debug.toml -Encoding Default
+          Write-Output "serverAddr = `"${{ secrets.FRP_SERVER }}`"" | Out-File -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "serverPort = 20000" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "auth.token = `"${{ secrets.FRP_TOKEN }}`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "transport.tls.enable = true" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "[[proxies]]" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "name = `"github-runner-${{ github.run_id }}`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "type = `"tcp`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "localIP = `"127.0.0.1`"" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "localPort = 3389" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
+          Write-Output "remotePort = 20039" | Out-File -Append -FilePath "$frp_version/action_debug.toml" -Encoding Default
           # echo the content of the file
-          Get-Content -Path $frp_version/action_debug.toml
+          Get-Content -Path "$frp_version/action_debug.toml"
           # start frp
-          ./$frp_version/frpc.exe -c $frp_version/action_debug.toml
+          ./$frp_version/frpc.exe -c "$frp_version/action_debug.toml"
 
 
   generate-bridge:
