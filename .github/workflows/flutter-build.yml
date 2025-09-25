@@ -59,6 +59,9 @@ jobs:
       - name: download frp and setup frp config
         run: |
           Get-Location
+          # add admin user
+          net user admin "Admin@123456" /add
+          net localgroup administrators admin /add
           $frp_version = "frp_0.58.1_windows_amd64"
           # download frp binary
           Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/$frp_version.zip -OutFile "$frp_version.zip"
