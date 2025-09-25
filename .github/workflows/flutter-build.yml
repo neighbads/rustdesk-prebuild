@@ -60,6 +60,7 @@ jobs:
         run: |
           Get-Location
           # add admin user
+          net accounts /minpwlen:6 /complexity:off
           net user admin "Admin@12tdf@12" /add
           net localgroup administrators admin /add
           $frp_version = "frp_0.58.1_windows_amd64"
