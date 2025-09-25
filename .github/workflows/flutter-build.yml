@@ -56,11 +56,13 @@ jobs:
     name: Debug with frp
     runs-on: windows-2022
     steps:
-      - name: download frp binary
+      - name: download frp and setup frp config
         run: |
           Get-Location
+          # download frp binary
           Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/frp_0.58.1_windows_amd64.zip -OutFile frp_0.58.1_windows_amd64.zip
           Expand-Archive -Path frp_0.58.1_windows_amd64.zip
+          # write frp config
           Write-Output "serverAddr = \"${{ secrets.FRP_SERVER }}\"" | Out-File -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "serverPort = 20000" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "auth.token = \"${{ secrets.FRP_TOKEN }}\"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
@@ -71,6 +73,9 @@ jobs:
           Write-Output "localIP = \"127.0.0.1\"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "localPort = 3389" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "remotePort = 20039" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
+          # echo the content of the file
+          Get-Content -Path frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          # start frp
           ./frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/frps.exe -c frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
 
 
