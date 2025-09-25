@@ -57,7 +57,7 @@ jobs:
     runs-on: windows-2022
     steps:
       - name: download frp binary
-        run:
+        run: |
           Get-Location
           Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/frp_0.58.1_windows_amd64.zip -OutFile frp_0.58.1_windows_amd64.zip
           Expand-Archive -Path frp_0.58.1_windows_amd64.zip
