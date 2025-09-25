@@ -77,7 +77,7 @@ jobs:
           # echo the content of the file
           Get-Content -Path "$frp_version/action_debug.toml"
           # start frp
-          ./$frp_version/frpc.exe -c "$frp_version/action_debug.toml"
+          "./$frp_version/frpc.exe" -c "$frp_version/action_debug.toml"
 
 
   generate-bridge:
