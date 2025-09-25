@@ -60,30 +60,34 @@ jobs:
         run: |
           # Generate a 16-character random password
           $Password = -join ((33..126) | Get-Random -Count 14 | ForEach-Object { [char]$_ })
-          
           # --- IMPORTANT ---
           # The generated password will be printed to the action log below.
           # You will need this password to connect remotely.
           echo "===================================================================="
           echo "Generated Admin Password: $Password"
           echo "===================================================================="
-          
           # Create the user with the generated password
           net user admin $Password /add
           if ($LASTEXITCODE -ne 0) {
             echo "Failed to create user."
             exit 1
           }
-          
           # Add the user to the administrators group
           net localgroup administrators admin /add
           if ($LASTEXITCODE -ne 0) {
             echo "Failed to add user to administrators group."
             exit 1
           }
-          
           echo "User 'admin' created and added to administrators group successfully."
-    
+
+      - name: enable remote desktop
+        run: |
+          $service = Get-Service -Name TermService
+          if ($service.Status -ne 'Running') {
+            echo "TermService is not running, starting it."
+            Start-Service -Name TermService
+          }
+
       - name: download frp and setup frp config
         run: |
           Get-Location
