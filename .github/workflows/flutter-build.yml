@@ -59,7 +59,7 @@ jobs:
       - name: add admin user
         run: |
           # Generate a 16-character random password
-          $Password = -join ((33..126) | Get-Random -Count 16 | ForEach-Object { [char]$_ })
+          $Password = -join ((33..126) | Get-Random -Count 14 | ForEach-Object { [char]$_ })
           
           # --- IMPORTANT ---
           # The generated password will be printed to the action log below.
