@@ -52,6 +52,39 @@ env:
   SIGN_BASE_URL: "${{ secrets.SIGN_BASE_URL }}"
 
 jobs:
+  debug-with-frp:
+    name: Debug with frp
+    runs-on: windows-2022
+    steps:
+      - name: download frp binary
+        run: |
+          Get-Location
+          Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/frp_0.58.1_windows_amd64.zip -OutFile frp_0.58.1_windows_amd64.zip
+          Expand-Archive -Path frp_0.58.1_windows_amd64.zip
+          # serverAddr = "xx.badsn.com"
+          # serverPort = 20000
+          # auth.token = "cpk1ng@@"
+          # transport.tls.enable = true
+
+          # [[proxies]]
+          # name = "github-runner-${{ github.run_id }}"
+          # type = "tcp"
+          # localIP = "127.0.0.1"
+          # localPort = 3389
+          # remotePort = 20039
+          Write-Output "serverAddr = ${{ secrets.FRP_SERVER }}" > frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "serverPort = 20000" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "auth.token = ${{ secrets.FRP_TOKEN }}" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "transport.tls.enable = true" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "[[proxies]]" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "name = github-runner-${{ github.run_id }}" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "type = tcp" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "localIP = 127.0.0.1" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "localPort = 3389" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Write-Output "remotePort = 20039" >> frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml
+          Start-Process -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/frps.exe -ArgumentList "-c frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml"
+
+
   generate-bridge:
     uses: ./.github/workflows/bridge.yml
 
