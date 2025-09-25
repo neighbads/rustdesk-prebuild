@@ -63,14 +63,14 @@ jobs:
           Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/frp_0.58.1_windows_amd64.zip -OutFile frp_0.58.1_windows_amd64.zip
           Expand-Archive -Path frp_0.58.1_windows_amd64.zip
           # write frp config
-          Write-Output "serverAddr = \"${{ secrets.FRP_SERVER }}\"" | Out-File -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
+          Write-Output "serverAddr = `"${{ secrets.FRP_SERVER }}`"" | Out-File -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "serverPort = 20000" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
-          Write-Output "auth.token = \"${{ secrets.FRP_TOKEN }}\"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
+          Write-Output "auth.token = `"${{ secrets.FRP_TOKEN }}`"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "transport.tls.enable = true" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "[[proxies]]" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
-          Write-Output "name = \"github-runner-${{ github.run_id }}\"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
+          Write-Output "name = `"github-runner-${{ github.run_id }}`"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "type = tcp" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
-          Write-Output "localIP = \"127.0.0.1\"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
+          Write-Output "localIP = `"127.0.0.1`"" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "localPort = 3389" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           Write-Output "remotePort = 20039" | Out-File -Append -FilePath frp_0.58.1_windows_amd64/frp_0.58.1_windows_amd64/action_debug.toml -Encoding Default
           # echo the content of the file
