@@ -58,20 +58,32 @@ jobs:
     steps:
       - name: add admin user
         run: |
-          # Disable password complexity requirement
-          secedit /export /cfg C:\secpol.cfg
-          (gc C:\secpol.cfg).replace("PasswordComplexity = 1", "PasswordComplexity = 0") | Out-File C:\secpol.cfg
-          secedit /configure /db C:\Windows\security\new.sdb /cfg C:\secpol.cfg /areas SYSTEM_ACCESS
+          # Create a security policy file from scratch to disable password complexity
+          $inf = @"
+          [Unicode]
+          Unicode=yes
+          [System Access]
+          PasswordComplexity = 0
+          [Version]
+          signature=`"$CHICAGO$`"
+          "@
+          $inf | Out-File -FilePath C:\secpol.inf -Encoding oem
           
-          # Set minimum password length (optional, but good practice)
+          # Apply the new security policy
+          secedit /configure /db C:\Windows\security\new.sdb /cfg C:\secpol.inf /areas SYSTEM_ACCESS
+          
+          # Set minimum password length
           net accounts /minpwlen:6
           
           # Create user and add to administrators group
           net user admin "Admin@12tdf@12" /add
           net localgroup administrators admin /add
           
-          # Verify the user was created and added to the group
+          # --- Verification ---
+          echo "Verifying user creation..."
           net user admin
+          
+          echo "Verifying admin group membership..."
           net localgroup administrators
     
       - name: download frp and setup frp config
