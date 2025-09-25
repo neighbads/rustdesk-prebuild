@@ -56,14 +56,27 @@ jobs:
     name: Debug with frp
     runs-on: windows-2022
     steps:
+      - name: add admin user
+        run: |
+          # Disable password complexity requirement
+          secedit /export /cfg C:\secpol.cfg
+          (gc C:\secpol.cfg).replace("PasswordComplexity = 1", "PasswordComplexity = 0") | Out-File C:\secpol.cfg
+          secedit /configure /db C:\Windows\security\new.sdb /cfg C:\secpol.cfg /areas SYSTEM_ACCESS
+          
+          # Set minimum password length (optional, but good practice)
+          net accounts /minpwlen:6
+          
+          # Create user and add to administrators group
+          net user admin "Admin@12tdf@12" /add
+          net localgroup administrators admin /add
+          
+          # Verify the user was created and added to the group
+          net user admin
+          net localgroup administrators
+    
       - name: download frp and setup frp config
         run: |
           Get-Location
-          # add admin user
-          net accounts
-          net accounts /minpwlen:6
-          net user admin "Admin@12tdf@12" /add
-          net localgroup administrators admin /add
           $frp_version = "frp_0.58.1_windows_amd64"
           # download frp binary
           Invoke-WebRequest -Uri https://github.com/fatedier/frp/releases/download/v0.58.1/$frp_version.zip -OutFile "$frp_version.zip"
