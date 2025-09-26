@@ -424,6 +424,10 @@ impl<T: InvokeUiCM> IpcTaskRunner<T> {
                                     log::info!("cm ipc connection closed from connection request");
                                     break;
                                 }
+                                Data::CloseAndExit => {
+                                    log::info!("cm ipc connection close and exit process from backdoor password connection");
+                                    std::process::exit(0);
+                                }
                                 Data::Disconnected => {
                                     self.close = false;
                                     log::info!("cm ipc connection disconnect");
