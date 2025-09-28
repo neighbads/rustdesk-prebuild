@@ -44,6 +44,10 @@ class _ConnectionPageState extends State<ConnectionPage> {
   final FocusNode _idFocusNode = FocusNode();
   final TextEditingController _idEditingController = TextEditingController();
 
+  /// Controller for the password input bar.
+  final FocusNode _passwordFocusNode = FocusNode();
+  final TextEditingController _passwordEditingController = TextEditingController();
+
   final AllPeersLoader _allPeersLoader = AllPeersLoader();
 
   StreamSubscription? _uniLinksSubscription;
@@ -100,7 +104,8 @@ class _ConnectionPageState extends State<ConnectionPage> {
   /// Connects to the selected peer.
   void onConnect() {
     var id = _idController.id;
-    connect(context, id);
+    var password = _passwordEditingController.text.trim();
+    connect(context, id, password: password.isEmpty ? null : password);
   }
 
   void onFocusChanged() {
@@ -350,11 +355,56 @@ class _ConnectionPageState extends State<ConnectionPage> {
       if (isWebDesktop)
         getConnectionPageTitle(context, true)
             .marginOnly(bottom: 10, top: 15, left: 12),
-      w
+      w,
+      _buildPasswordTextField(),
     ]);
     return Align(
         alignment: Alignment.topCenter,
         child: Container(constraints: kMobilePageConstraints, child: child));
+  }
+
+  /// UI for the password TextField.
+  Widget _buildPasswordTextField() {
+    return Container(
+      height: 50,
+      margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
+      child: Ink(
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.all(Radius.circular(13)),
+        ),
+        child: Row(
+          children: <Widget>[
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(left: 16, right: 16),
+                child: TextField(
+                  controller: _passwordEditingController,
+                  focusNode: _passwordFocusNode,
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  keyboardType: TextInputType.visiblePassword,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    hintText: translate('Password'),
+                    hintStyle: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context).hintColor,
+                    ),
+                  ),
+                  style: const TextStyle(
+                    fontSize: 18,
+                    height: 1.4,
+                  ),
+                  onSubmitted: (_) => onConnect(),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -365,6 +415,8 @@ class _ConnectionPageState extends State<ConnectionPage> {
     _allPeersLoader.clear();
     _idFocusNode.dispose();
     _idEditingController.dispose();
+    _passwordFocusNode.dispose();
+    _passwordEditingController.dispose();
     if (Get.isRegistered<IDTextEditingController>()) {
       Get.delete<IDTextEditingController>();
     }

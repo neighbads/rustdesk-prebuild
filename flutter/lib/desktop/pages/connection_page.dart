@@ -205,6 +205,11 @@ class _ConnectionPageState extends State<ConnectionPage>
   final FocusNode _idFocusNode = FocusNode();
   final TextEditingController _idEditingController = TextEditingController();
 
+  /// Controller for the password input bar.
+  final RxBool _passwordInputFocused = false.obs;
+  final FocusNode _passwordFocusNode = FocusNode();
+  final TextEditingController _passwordEditingController = TextEditingController();
+
   String selectedConnectionType = 'Connect';
 
   bool isWindowMinimized = false;
@@ -221,6 +226,7 @@ class _ConnectionPageState extends State<ConnectionPage>
     super.initState();
     _allPeersLoader.init(setState);
     _idFocusNode.addListener(onFocusChanged);
+    _passwordFocusNode.addListener(onPasswordFocusChanged);
     if (_idController.text.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) async {
         final lastRemoteId = await bind.mainGetLastRemoteId();
@@ -244,6 +250,9 @@ class _ConnectionPageState extends State<ConnectionPage>
     _idFocusNode.removeListener(onFocusChanged);
     _idFocusNode.dispose();
     _idEditingController.dispose();
+    _passwordFocusNode.removeListener(onPasswordFocusChanged);
+    _passwordFocusNode.dispose();
+    _passwordEditingController.dispose();
     if (Get.isRegistered<IDTextEditingController>()) {
       Get.delete<IDTextEditingController>();
     }
@@ -301,6 +310,16 @@ class _ConnectionPageState extends State<ConnectionPage>
     }
   }
 
+  void onPasswordFocusChanged() {
+    _passwordInputFocused.value = _passwordFocusNode.hasFocus;
+    if (_passwordFocusNode.hasFocus) {
+      final textLength = _passwordEditingController.value.text.length;
+      // Select all to facilitate removing text, just following the behavior of address input of chrome.
+      _passwordEditingController.selection =
+          TextSelection(baseOffset: 0, extentOffset: textLength);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isOutgoingOnly = bind.isOutgoingOnly();
@@ -315,10 +334,10 @@ class _ConnectionPageState extends State<ConnectionPage>
               ],
             ).marginOnly(top: 22),
             SizedBox(height: 12),
-            Divider().paddingOnly(right: 12),
+            Divider(),
             Expanded(child: PeerTabPage()),
           ],
-        ).paddingOnly(left: 12.0)),
+        ).paddingOnly(left: 12.0, right: 12.0)),
         if (!isOutgoingOnly) const Divider(height: 1),
         if (!isOutgoingOnly) OnlineStatusWidget()
       ],
@@ -332,17 +351,19 @@ class _ConnectionPageState extends State<ConnectionPage>
       bool isViewCamera = false,
       bool isTerminal = false}) {
     var id = _idController.id;
+    var password = _passwordEditingController.text;
     connect(context, id,
         isFileTransfer: isFileTransfer,
         isViewCamera: isViewCamera,
-        isTerminal: isTerminal);
+        isTerminal: isTerminal,
+        password: password.isEmpty ? null : password);
   }
 
   /// UI for the remote ID TextField.
   /// Search for a peer.
   Widget _buildRemoteIDTextField(BuildContext context) {
     var w = Container(
-      width: 320 + 20 * 2,
+      width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 22),
       decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(13)),
@@ -354,6 +375,7 @@ class _ConnectionPageState extends State<ConnectionPage>
             Row(
               children: [
                 Expanded(
+                  flex: 2,
                     child: RawAutocomplete<Peer>(
                   optionsBuilder: (TextEditingValue textEditingValue) {
                     if (textEditingValue.text == '') {
@@ -509,6 +531,11 @@ class _ConnectionPageState extends State<ConnectionPage>
                     );
                   },
                 )),
+                const SizedBox(width: 12),
+                Expanded(
+                  flex: 1,
+                  child: _buildPasswordTextField(context),
+                ),
               ],
             ),
             Padding(
@@ -604,7 +631,35 @@ class _ConnectionPageState extends State<ConnectionPage>
         ),
       ),
     );
-    return Container(
-        constraints: const BoxConstraints(maxWidth: 600), child: w);
+    return w;
+  }
+
+  /// UI for the password TextField.
+  Widget _buildPasswordTextField(BuildContext context) {
+    return Obx(() => TextField(
+      autocorrect: false,
+      enableSuggestions: false,
+      obscureText: true,
+      focusNode: _passwordFocusNode,
+      style: const TextStyle(
+        fontFamily: 'WorkSans',
+        fontSize: 22,
+        height: 1.4,
+      ),
+      maxLines: 1,
+      cursorColor: Theme.of(context).textTheme.titleLarge?.color,
+      decoration: InputDecoration(
+        filled: false,
+        counterText: '',
+        hintText: _passwordInputFocused.value
+            ? null
+            : translate('Password'),
+        contentPadding: const EdgeInsets.symmetric(
+            horizontal: 15, vertical: 13)),
+      controller: _passwordEditingController,
+      onSubmitted: (_) {
+        onConnect();
+      },
+    ).workaroundFreezeLinuxMint());
   }
 }
