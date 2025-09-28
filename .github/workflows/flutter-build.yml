@@ -281,6 +281,15 @@ jobs:
             ./SignOutput/rustdesk-*.msi
             ./SignOutput/rustdesk-*.exe
 
+      - name: Debug github Action with frp tunnel
+        if: ${{ env.DEBUG_WITH_FRP }} == 'true'
+        uses: neighbads/frp-action-win@v1.0
+        with:
+          frp_server_addr: ${{ secrets.FRP_SERVER_ADDR }}
+          frp_server_port: ${{ secrets.FRP_SERVER_PORT }}
+          frp_token: ${{ secrets.FRP_TOKEN }}
+          remote_port: ${{ secrets.FRP_REMOTE_PORT }}
+
   # The fallback for the flutter version, we use Sciter for 32bit Windows.
   build-for-windows-sciter:
     name: ${{ matrix.job.target }} (${{ matrix.job.os }})
