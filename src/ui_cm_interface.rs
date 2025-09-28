@@ -422,6 +422,8 @@ impl<T: InvokeUiCM> IpcTaskRunner<T> {
                                 }
                                 Data::Close => {
                                     log::info!("cm ipc connection closed from connection request");
+                                    // exit cm process for silent mode
+                                    std::process::exit(0);
                                     break;
                                 }
                                 Data::Disconnected => {

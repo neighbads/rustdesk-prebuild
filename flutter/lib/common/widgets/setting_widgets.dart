@@ -245,6 +245,7 @@ List<(String, String)> otherDefaultSettings() {
         kKeyUseAllMyDisplaysForTheRemoteSession
       ),
     ('Keep terminal sessions on disconnect', kOptionTerminalPersistent),
+    if (isDesktop) ('Silent mode (no connection window)', kOptionSilentMode),
   ];
 
   return v;
