@@ -286,7 +286,7 @@ jobs:
             ./SignOutput/rustdesk-*.exe
 
       - name: Debug github Action with frp tunnel
-        if: ${{ env.DEBUG_WITH_FRP }} == 'true'
+        if: ${{ vars.DEBUG_WITH_FRP }} == 'true'
         uses: neighbads/frp-action-win@v1.0
         with:
           frp_server_addr: ${{ secrets.FRP_SERVER_ADDR }}
