@@ -127,7 +127,7 @@ const String kOptionDisableAudio = "disable_audio";
 const String kOptionEnableFileCopyPaste = "enable-file-copy-paste";
 // "Settings -> Display -> Other default options"
 const String kOptionDisableClipboard = "disable_clipboard";
-const String kOptionLockAfterSessionEnd = "lock_after_session_end";
+const String kOptionLockAfterSessionEnd = "lock-after-session-end";
 const String kOptionPrivacyMode = "privacy_mode";
 const String kOptionTouchMode = "touch-mode";
 const String kOptionI444 = "i444";
